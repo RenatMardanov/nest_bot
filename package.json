@@ -19,7 +19,11 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "postgres:up": "docker compose -f docker-compose.postgres.yaml up -d",
-    "postgres:down": "docker compose -f docker-compose.postgres.yaml down"
+    "postgres:down": "docker compose -f docker-compose.postgres.yaml down",
+    "prepare": "husky",
+    "lint-staged": "lint-staged",
+    "type-check": "tsc --noEmit",
+    "prettier": "prettier -w"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -32,6 +36,8 @@
     "telegraf": "^4.16.3"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^11.0.0",
