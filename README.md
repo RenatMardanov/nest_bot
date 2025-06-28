@@ -1,98 +1,231 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Finance Telegram Bot & Mini App
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Финансовое приложение с Telegram ботом и Telegram Mini App для управления личными финансами.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Архитектура проекта
 
-## Description
+Проект построен на модульной архитектуре NestJS с четким разделением ответственности:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
+```
+src/
+├── core/                          # Базовые модули
+│   ├── config/                    # Конфигурация приложения
+│   ├── database/                  # Интеграция с Prisma и БД
+│   ├── logger/                    # Кастомный логгер
+│   └── auth/                      # Авторизация
+│
+├── common/                        # Общие компоненты
+│   ├── decorators/                # Кастомные декораторы
+│   ├── filters/                   # Exception filters
+│   ├── pipes/                     # Validation pipes
+│   └── types/                     # Общие типы
+│
+├── modules/                       # Бизнес-логика (общая для всех интерфейсов)
+│   ├── users/                     # Управление пользователями
+│   │   ├── users.module.ts
+│   │   ├── users.service.ts
+│   │   └── dto/
+│   │
+│   ├── finance/                   # Финансовый модуль
+│   │   ├── finance.module.ts      # Объединяющий модуль
+│   │   ├── finance.service.ts     # Координирующий сервис
+│   │   ├── transactions/          # Транзакции
+│   │   ├── categories/            # Категории расходов/доходов
+│   │   ├── currencies/            # Валюты
+│   │   ├── budgets/               # Бюджеты
+│   │   └── reports/               # Отчеты и аналитика
+│   │
+│   └── notifications/             # Уведомления
+│
+├── interfaces/                    # Интерфейсы взаимодействия
+│   ├── telegram/                  # Telegram интерфейс
+│   │   ├── bot/                   # Telegram Bot
+│   │   │   ├── scenes/            # Сцены бота
+│   │   │   └── handlers/          # Обработчики команд
+│   │   └── webhooks/              # Webhook для Mini App
+│   │
+│   └── api/                       # REST API
+│       └── v1/                    # Версионирование API
+│
+├── app.module.ts                  # Главный модуль приложения
+└── main.ts                        # Точка входа
 ```
 
-## Compile and run the project
+## Технологический стек
+
+- **NestJS 11.0.1** - основной фреймворк
+- **Prisma 6.10.1** - ORM для работы с базой данных
+- **PostgreSQL** - СУБД
+- **nestjs-telegraf 2.9.1** - интеграция с Telegram Bot API
+- **Swagger** - документация API
+- **TypeScript** - язык программирования
+- **Docker** - контейнеризация
+
+## Начало работы
+
+### Предварительные требования
+
+- Node.js 18+
+- Docker и Docker Compose
+- Telegram Bot Token (получить у [@BotFather](https://t.me/BotFather))
+
+### Установка
+
+1. Клонировать репозиторий:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+git clone <repository-url>
+cd nest_bot
 ```
 
-## Run tests
+2. Установить зависимости:
 
 ```bash
-# unit tests
-$ npm run test
+npm install
+```
 
-# e2e tests
-$ npm run test:e2e
+3. Настроить переменные окружения:
+
+```bash
+cp .env.example .env
+# Отредактировать .env файл, добавив TELEGRAM_BOT_TOKEN
+```
+
+4. Запустить PostgreSQL:
+
+```bash
+npm run postgres:up
+```
+
+5. Применить миграции:
+
+```bash
+npx prisma migrate deploy
+```
+
+6. Запустить приложение:
+
+```bash
+npm run start:dev
+```
+
+## Разработка
+
+### Структура модулей
+
+Каждый модуль содержит:
+
+- `*.module.ts` - определение модуля
+- `*.service.ts` - бизнес-логика
+- `*.controller.ts` - REST API (если применимо)
+- `dto/` - объекты передачи данных
+- `entities/` - сущности
+
+### Telegram Bot
+
+Бот использует библиотеку nestjs-telegraf и поддерживает:
+
+- Команды
+- Сцены для сложных взаимодействий
+- Inline клавиатуры
+
+Пример команды:
+
+```typescript
+@Command('add_expense')
+async addExpenseCommand(@Ctx() ctx: Context) {
+  await ctx.reply('Введите сумму расхода:');
+  ctx.scene.enter('add-expense');
+}
+```
+
+### REST API
+
+API документирован с помощью Swagger и доступен по адресу `/docs`.
+
+Основные эндпоинты:
+
+- `/api/v1/transactions` - управление транзакциями
+- `/api/v1/categories` - управление категориями
+- `/api/v1/reports` - получение отчетов
+
+## База данных
+
+### Схема
+
+```prisma
+model user {
+  id String @id @default(uuid())
+  telegram_id BigInt @unique
+  first_name String
+  last_name String?
+  email String?
+  is_registered Boolean @default(false)
+  registration_date DateTime?
+  last_activity DateTime?
+  currencies currency[]
+  categories category[]
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+model currency {
+  id String @id @default(uuid())
+  name String
+  symbol String
+  users user[]
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+model category {
+  id String @id @default(uuid())
+  name String @unique
+  users user[]
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+```
+
+## Тестирование
+
+```bash
+# unit тесты
+npm run test
+
+# e2e тесты
+npm run test:e2e
 
 # test coverage
-$ npm run test:cov
+npm run test:cov
 ```
 
-## Deployment
+## Деплой
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Docker
 
 ```bash
-$ npm install -g mau
-$ mau deploy
+# Сборка образа
+docker build -t finance-bot .
+
+# Запуск контейнера
+docker run -p 3000:3000 --env-file .env finance-bot
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Без Docker
 
-## Resources
+```bash
+npm run build
+npm run start:prod
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+## Принципы разработки
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+1. **DRY (Don't Repeat Yourself)** - общая бизнес-логика для всех интерфейсов
+2. **SOLID** - особенно принцип единственной ответственности
+3. **Domain-Driven Design** - модули организованы по бизнес-доменам
+4. **Чистая архитектура** - независимость бизнес-логики от фреймворков
 
-## Support
+## Лицензия
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+[MIT](LICENSE)
