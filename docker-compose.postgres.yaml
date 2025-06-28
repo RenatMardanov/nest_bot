@@ -1,0 +1,13 @@
+services:
+  postgres:
+    container_name: postgres_local
+    image: postgres:17.4
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db_data/profile/postgres/:/var/lib/postgresql/data
+      - ./db_data/profile/run/postgres.sock:/var/run/postgres/postgres.sock
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=finance_dev
